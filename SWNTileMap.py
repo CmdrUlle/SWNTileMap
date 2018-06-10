@@ -120,6 +120,7 @@ def main():
 	SMALLTC = 9
 	CORRIDORC = 6
 	BLASTDOORS_C_O = 11
+	GREEN=12
 	HULL = -1
 	EMPTY = -2
 	if args.OverlayImage is not None:
@@ -146,6 +147,7 @@ def main():
 	tex_blastdoors_c_o = [pg.image.load('Images/BLASTDOORSC%s_O.png' % na_add) for na_add in namin_add]
 	
 	tex_hull = pg.image.load('Images/HULL.png')
+	tex_green = [pg.image.load('Images/GRASS%d.png' % digAdd) for digAdd in [1,2,3, 1, 2]] #5 because of rotation
 	
 	
 
@@ -164,7 +166,7 @@ def main():
 	tex_blastdoors_c_o = [pg.transform.scale(tex_blastdoors_c_o[i], (TILESIZE,TILESIZE)).convert() for i in range(5)]
 	
 	tex_hull = [pg.transform.scale(tex_hull, (TILESIZE,TILESIZE)).convert()]
-	
+	tex_green = [pg.transform.scale(tex_green[i], (TILESIZE,TILESIZE)).convert() for i in range(5)]
 	
 	print('Map Dimensions: '+str(MAPWIDTH*3.5)+'m * ' +str(MAPHEIGHT*3.5)+'m')
 	print('Map Dimensions: '+str(MAPWIDTH)+' * ' +str(MAPHEIGHT)+'')
@@ -194,7 +196,8 @@ def main():
 					BLASTDOORS_C : tex_blastdoors_c,
 					HULL : tex_hull,
 					EMPTY : tex_space, 
-					BLASTDOORS_C_O : tex_blastdoors_c_o
+					BLASTDOORS_C_O : tex_blastdoors_c_o, 
+					GREEN : tex_green
 				}
 
 
@@ -260,9 +263,9 @@ def main():
 					if ff <= ship_limit+10 and tilemap[ix][iy][iz] == -2:
 						tilemap[ix][iy][iz] = WALL
 		
-	ren_text = [' ' for z in range(11)]
+	ren_text = [' ' for z in range(13)]
 	font = pg.font.Font(None, 20)
-	for i in range(0, 11):
+	for i in range(0, 13):
 		ren_text[i] = font.render(str(i), True, pg.Color(173,255,47))
 	ren_text_t = font.render('t', True, pg.Color(173,255,47))
 	ren_text_z = font.render('z', True, pg.Color(173,255,47))
@@ -352,6 +355,8 @@ def main():
 						active_paint = 9
 					elif event.key == pg.K_0:
 						active_paint = 10
+					elif event.key == pg.K_g:
+						active_paint = 12
 					elif event.key == pg.K_t:
 						active_paint = -1 #HULL
 					elif event.key == pg.K_z:
@@ -474,27 +479,27 @@ def main():
 			for row in range(MAPHEIGHT):
 				for column in range(MAPWIDTH):
 					big_draw_method(screen, tilemap, images, MAPHEIGHT, MAPWIDTH, [column, row, cur_level], TILESIZE, camera)
-		for ii in [0,1,2,3,4,5,6,7,8,9,10,-1, -2, -3, -4, -5]:
-			
+		for ii in [0,1,2,3,4,5,6,7,8,9,10,12, -1, -2, -3, -4, -5]:
+			shift_negative = 18
 			if ii >= 0:
 				screen.blit((images[ii])[-1], ((SCREENWIDTH)*TILESIZE, (ii+0)*TILESIZE, TILESIZE, TILESIZE))			
 				screen.blit(ren_text[ii], ((SCREENWIDTH)*TILESIZE, (ii+0)*TILESIZE, TILESIZE, TILESIZE))
 			elif ii == -1:
-				screen.blit((images[ii])[0], ((SCREENWIDTH)*TILESIZE, (ii+17)*TILESIZE, TILESIZE, TILESIZE))		
-				screen.blit(ren_text_t, ((SCREENWIDTH)*TILESIZE, (ii+17)*TILESIZE, TILESIZE, TILESIZE))				
+				screen.blit((images[ii])[0], ((SCREENWIDTH)*TILESIZE, (ii+shift_negative)*TILESIZE, TILESIZE, TILESIZE))		
+				screen.blit(ren_text_t, ((SCREENWIDTH)*TILESIZE, (ii+shift_negative)*TILESIZE, TILESIZE, TILESIZE))				
 			elif ii == -2:
-				screen.blit((images[ii])[0], ((SCREENWIDTH)*TILESIZE, (ii+17)*TILESIZE, TILESIZE, TILESIZE))		
-				screen.blit(ren_text_z, ((SCREENWIDTH)*TILESIZE, (ii+17)*TILESIZE, TILESIZE, TILESIZE))
+				screen.blit((images[ii])[0], ((SCREENWIDTH)*TILESIZE, (ii+shift_negative)*TILESIZE, TILESIZE, TILESIZE))		
+				screen.blit(ren_text_z, ((SCREENWIDTH)*TILESIZE, (ii+shift_negative)*TILESIZE, TILESIZE, TILESIZE))
 			elif ii == -3:
-				screen.blit(ren_text_desel, ((SCREENWIDTH)*TILESIZE, (ii+17)*TILESIZE, TILESIZE, TILESIZE))
+				screen.blit(ren_text_desel, ((SCREENWIDTH)*TILESIZE, (ii+shift_negative)*TILESIZE, TILESIZE, TILESIZE))
 			elif ii == -4:
-				screen.blit(ren_text_save, ((SCREENWIDTH)*TILESIZE, (ii+17)*TILESIZE, TILESIZE, TILESIZE))
+				screen.blit(ren_text_save, ((SCREENWIDTH)*TILESIZE, (ii+shift_negative)*TILESIZE, TILESIZE, TILESIZE))
 			elif ii == -5:
-				screen.blit(ren_text_load, ((SCREENWIDTH)*TILESIZE, (ii+17)*TILESIZE, TILESIZE, TILESIZE))
+				screen.blit(ren_text_load, ((SCREENWIDTH)*TILESIZE, (ii+shift_negative)*TILESIZE, TILESIZE, TILESIZE))
 			elif ii == -6:
-				screen.blit(ren_text_lvlup, ((SCREENWIDTH)*TILESIZE, (ii+17)*TILESIZE, TILESIZE, TILESIZE))
+				screen.blit(ren_text_lvlup, ((SCREENWIDTH)*TILESIZE, (ii+shift_negative)*TILESIZE, TILESIZE, TILESIZE))
 			elif ii == -7:
-				screen.blit(ren_text_lvldown, ((SCREENWIDTH)*TILESIZE, (ii+17)*TILESIZE, TILESIZE, TILESIZE))
+				screen.blit(ren_text_lvldown, ((SCREENWIDTH)*TILESIZE, (ii+shift_negative)*TILESIZE, TILESIZE, TILESIZE))
 			
 		if not active_paint == -3: 
 			#pg.draw.rect(screen, pg.Color(0, 255, 0, 50), ((MAPWIDTH)*TILESIZE, (active_paint+2)*TILESIZE, TILESIZE, TILESIZE))
@@ -629,8 +634,8 @@ def what_should_i_draw(tilemap, playMode_cur, MAPHEIGHT, MAPWIDTH):
 				retList.append(tile)
 				break
 			else: #Tiletype is walkable and not a door
-				if cur_tiletype == 4 or cur_tiletype == 5 or cur_tiletype == 6 or cur_tiletype == 11: #Cooridorlike / Room / Doorlike open
-					if tile_tiletype == 4 or tile_tiletype == 5 or tile_tiletype == 6 or tile_tiletype == 11:
+				if cur_tiletype == 4 or cur_tiletype == 5 or cur_tiletype == 6 or cur_tiletype == 11 or cur_tiletype == 12: #Cooridorlike / Room / Doorlike open
+					if tile_tiletype == 4 or tile_tiletype == 5 or tile_tiletype == 6 or tile_tiletype == 11 or tile_tiletype == 12:
 						retList.append(tile)
 					else:
 						retList.append(tile)
