@@ -9,6 +9,7 @@ import numpy as np
 import copy
 from tkinter import filedialog
 import tkinter
+import argparse
 import pdb  
 
 # Todo: Draw method
@@ -50,19 +51,39 @@ def complex_camera(camera, target_rect, WIDTH, HEIGHT, TILESIZE):
 	return Rect(l*TILESIZE, t*TILESIZE, w, h)
 	
 def main():
+	parser = argparse.ArgumentParser(description='Process some integers.')
+	parser.add_argument('-px', '--PixelScreenWidth', type=int, help='Screen width in pixel', default=1895)
+	parser.add_argument('-py', '--PixelScreenHeight', type=int, help='Screen height in pixel', default=1000)
+	parser.add_argument('-tx', '--TileScreenWidth', type=int, help='Screen width in tiles', default=-1)
+	parser.add_argument('-ty', '--TileScreenHeight', type=int, help='Screen height in tiles', default=-1)
+	parser.add_argument('-mx', '--MapScreenWidth', type=int, help='Map width in tiles', default=53)
+	parser.add_argument('-my', '--MapScreenHeight', type=int, help='Map height in tiles', default=27)
+	parser.add_argument('-ts', '--TileSize', type=int, help='Tile size in pixel', default=35)
+	parser.add_argument('-z', '--levels', type=int, help='Levels', default=8)
+	parser.add_argument('-lm', '--loadMap', type=str, help='Load map xyz.npy on startup')
+	parser.add_argument('--OverlayImage', type=str, help='Overlay map with images in LevelOverlay/*.* Needs tweaking...', default='')
+	args = parser.parse_args()
+
 	#some off/on
 	generate_ship = False
 	
 	#useful game dimensions
 	#Tiles are 3-4m each
-	pixelScreenWidth = 1895
-	pixelScreenHeight = 1000
-	TILESIZE  = 35
-	SCREENWIDTH = round(pixelScreenWidth/TILESIZE)
-	SCREENHEIGHT = round(pixelScreenHeight/TILESIZE)
-	MAPWIDTH  = 53
-	MAPHEIGHT = 27
-	LEVELS = 8
+	pixelScreenWidth = args.PixelScreenWidth
+	pixelScreenHeight = args.PixelScreenHeight
+	TILESIZE  = args.TileSize
+	if args.TileScreenWidth == -1:
+		SCREENWIDTH = round(pixelScreenWidth/TILESIZE) #how many tiles are shown on the screen
+	else: 
+		SCREENWIDTH = args.TileScreenWidth
+	if args.TileScreenHeight == -1:
+		SCREENHEIGHT = round(pixelScreenHeight/TILESIZE) #how many tiles are shown on the screen
+	else: 
+		SCREENHEIGHT = args.TileScreenHeight
+	SCREENHEIGHT = round(pixelScreenHeight/TILESIZE) #above
+	MAPWIDTH  = args.MapScreenWidth									#how many tiles does the map have.
+	MAPHEIGHT = args.MapScreenHeight									#above
+	LEVELS = args.levels
 
 	#set up the display
 	os.environ['SDL_VIDEO_WINDOW_POS'] = "0,20"
@@ -101,7 +122,10 @@ def main():
 	BLASTDOORS_C_O = 11
 	HULL = -1
 	EMPTY = -2
-
+	if args.OverlayImage is not '':
+		overlay_images = ['5','6','7','8','9']
+		overlay_image = [pg.image.load('LevelOverlay/Starship-Karokh-Orthos-%s-1991.jpg' % na_add) for na_add in overlay_images]
+		overlay_image = [pg.transform.scale(overlay_image[i], (pixelScreenWidth,pixelScreenHeight)).convert() for i in range(len(overlay_images))]
 	
 	#BLASTDOORS_B = 8
 	#BLASTDOORS_S = 9
@@ -267,7 +291,8 @@ def main():
 	
 	
 	##########
-	#tilemap = loadMap('map.map')
+	if args.loadMap is not None:
+		tilemap = loadMap(args.loadMap)
 	#tilemap[tilemap==-1] = 10
 	clock = pg.time.Clock()
 	##########
