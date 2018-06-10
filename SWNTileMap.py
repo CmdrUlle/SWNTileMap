@@ -61,7 +61,7 @@ def main():
 	parser.add_argument('-ts', '--TileSize', type=int, help='Tile size in pixel', default=35)
 	parser.add_argument('-z', '--levels', type=int, help='Levels', default=8)
 	parser.add_argument('-lm', '--loadMap', type=str, help='Load map xyz.npy on startup')
-	parser.add_argument('--OverlayImage', type=str, help='Overlay map with images in LevelOverlay/*.* Needs tweaking...', default='')
+	parser.add_argument('--OverlayImage', type=str, help='Overlay map with images in LevelOverlay/*.* Needs tweaking...')
 	args = parser.parse_args()
 
 	#some off/on
@@ -122,7 +122,7 @@ def main():
 	BLASTDOORS_C_O = 11
 	HULL = -1
 	EMPTY = -2
-	if args.OverlayImage is not '':
+	if args.OverlayImage is not None:
 		overlay_images = ['5','6','7','8','9']
 		overlay_image = [pg.image.load('LevelOverlay/Starship-Karokh-Orthos-%s-1991.jpg' % na_add) for na_add in overlay_images]
 		overlay_image = [pg.transform.scale(overlay_image[i], (pixelScreenWidth,pixelScreenHeight)).convert() for i in range(len(overlay_images))]
@@ -325,7 +325,7 @@ def main():
 				elif event.key == pg.K_s:
 					saveMap(tilemap)
 				elif event.key == pg.K_x:
-					tilemap = loadMap('map.map')
+					tilemap = loadMap(None)
 				elif event.key == pg.K_m:
 					saveImage = True
 					saveImageLevelName = saveImageLevelPart1(screen, cur_level)
@@ -499,6 +499,10 @@ def main():
 		if not active_paint == -3: 
 			#pg.draw.rect(screen, pg.Color(0, 255, 0, 50), ((MAPWIDTH)*TILESIZE, (active_paint+2)*TILESIZE, TILESIZE, TILESIZE))
 			screen.blit(active_selection, ((SCREENWIDTH)*TILESIZE, (active_paint)*TILESIZE, TILESIZE, TILESIZE))
+		#Draw
+		if args.OverlayImage is not None and cur_level < 5:
+			screen.blit(overlay_image[cur_level], (0, 0, SCREENWIDTH*TILESIZE, SCREENHEIGHT*TILESIZE), None, BLEND_RGBA_MULT )
+			
 		#update the display
 		pg.display.update()
 		if saveImage:
@@ -515,9 +519,10 @@ def saveMap(tilemap):
 
 def loadMap(mapname):
 	print('Map loading...')
-	mapname = "map.map.npy"
-	tkinter.Tk().withdraw()
-	mapname = filedialog.askopenfilename(initialdir=r"./", filetypes=[("Map files","*.npy")])
+	
+	if mapname is None:
+		tkinter.Tk().withdraw()
+		mapname = filedialog.askopenfilename(initialdir=r"./", filetypes=[("Map files","*.npy")])
 	return np.load(mapname)
 	
 def saveImageLevelPart1(screen, cur_level):
